@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DFX Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    h1 { font-size: 24px; color: #ff6600; }
+    
+    #status { font-size: 14px; color: #666; }
+
+    #controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    input, select {
+      padding: 10px 14px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+    }
+
+    input { width: 250px; }
+
+    #stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 20px 28px;
+      border: 1px solid #333;
+    }
+
+    .stat-card p { font-size: 13px; color: #666; margin-bottom: 6px; }
+    .stat-card h2 { font-size: 28px; color: #ff6600; }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .asset-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #333;
+      transition: border-color 0.2s;
+    }
+
+    .asset-card:hover { border-color: #ff6600; }
+
+    .asset-name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .asset-blockchain {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .loading { text-align: center; color: #666; padding: 60px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DFX Asset Dashboard</h1>
+    <span id="status">Loading...</span>
+  </header>
+
+  <div id="stats">
+    <div class="stat-card">
+      <p>Total Assets</p>
+      <h2 id="total-assets">—</h2>
+    </div>
+    <div class="stat-card">
+      <p>Blockchains</p>
+      <h2 id="total-blockchains">—</h2>
+    </div>
+  </div>
+
+  <div id="controls">
+    <input type="text" id="search" placeholder="Search asset..." oninput="render()">
+    <select id="filter" onchange="render()">
+      <option value="all">All Blockchains</option>
+    </select>
+  </div>
+
+  <div id="grid">
+    <div class="loading">Fetching DFX assets...</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
