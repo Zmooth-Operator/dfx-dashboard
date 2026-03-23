@@ -138,20 +138,6 @@
       min-width: 150px;
     }
 
-    #sim-controls button {
-      padding: 10px 20px;
-      background: #ff6600;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    #sim-controls button:hover {
-      background: #e55a00;
-    }
-
     #sim-result {
       font-size: 18px;
       color: #fff;
@@ -191,13 +177,12 @@
   <div id="simulator">
     <h2>Buy Simulator</h2>
     <div id="sim-controls">
-      <input type="number" id="sim-amount" placeholder="Amount in EUR">
-      <select id="sim-coin">
+      <input type="number" id="sim-amount" placeholder="Amount in EUR" oninput="simulate()">
+      <select id="sim-coin" onchange="simulate()">
         <option value="bitcoin">Bitcoin (BTC)</option>
         <option value="ethereum">Ethereum (ETH)</option>
         <option value="solana">Solana (SOL)</option>
       </select>
-      <button onclick="simulate()">Calculate</button>
     </div>
     <div id="sim-result"></div>
   </div>
@@ -212,18 +197,15 @@
       const coin = document.getElementById("sim-coin").value;
 
       if (!amount || amount <= 0) {
-        document.getElementById("sim-result").innerHTML = "Please enter a valid amount.";
+        document.getElementById("sim-result").innerHTML = "";
         return;
       }
 
-      document.getElementById("sim-result").innerHTML = "Loading...";
-
       const response = await fetch(
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`)}`
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`
       );
-const text = await response.text();
-const data = JSON.parse(text);
-const price = data[coin].eur;
+      const data = await response.json();
+      const price = data[coin].eur;
 
       const dfxFee = 0.0149;
       const amountAfterFee = amount * (1 - dfxFee);
