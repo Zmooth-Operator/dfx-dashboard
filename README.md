@@ -1,6 +1,10 @@
 # DFX Asset Dashboard
 
-A live dashboard that displays all supported assets from the DFX Swiss public API.
+A live dashboard that displays all supported assets from the DFX Swiss public API — including a buy simulator with live prices and DFX fees.
+
+## Live Demo
+
+👉 [View live dashboard](https://zmooth-operator.github.io/dfx-dashboard/)
 
 ## What it does
 
@@ -8,6 +12,7 @@ A live dashboard that displays all supported assets from the DFX Swiss public AP
 - Displays assets across 25+ blockchains
 - Filter by blockchain
 - Search by asset name
+- Buy simulator with live prices and DFX fee calculation
 - No backend needed — runs entirely in the browser
 
 ## Tech stack
@@ -15,6 +20,7 @@ A live dashboard that displays all supported assets from the DFX Swiss public AP
 - TypeScript
 - HTML & CSS
 - DFX Swiss public API
+- CoinGecko API (live prices)
 
 ## How to run
 
