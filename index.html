@@ -15,18 +15,11 @@
       padding: 32px;
     }
 
-    @media (max-width: 600px) {
-      body { padding: 16px; }
-      h1 { font-size: 18px; }
-    }
-
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 32px;
-      flex-wrap: wrap;
-      gap: 8px;
     }
 
     h1 { font-size: 24px; color: #ff6600; }
@@ -37,17 +30,6 @@
       display: flex;
       gap: 12px;
       margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    #controls input {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    #controls select {
-      flex: 1;
-      min-width: 150px;
     }
 
     input, select {
@@ -59,11 +41,12 @@
       font-size: 14px;
     }
 
+    input { width: 250px; }
+
     #stats {
       display: flex;
       gap: 16px;
       margin-bottom: 32px;
-      flex-wrap: wrap;
     }
 
     .stat-card {
@@ -71,8 +54,6 @@
       border-radius: 10px;
       padding: 20px 28px;
       border: 1px solid #333;
-      flex: 1;
-      min-width: 120px;
     }
 
     .stat-card p { font-size: 13px; color: #666; margin-bottom: 6px; }
@@ -106,48 +87,40 @@
     }
 
     .loading { text-align: center; color: #666; padding: 60px; font-size: 18px; }
-
     #simulator {
-      background: #1a1a1a;
-      border-radius: 10px;
-      padding: 24px;
-      margin-bottom: 32px;
-      border: 1px solid #333;
-    }
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid #333;
+}
 
-    #simulator h2 {
-      font-size: 16px;
-      color: #ff6600;
-      margin-bottom: 16px;
-    }
+#simulator h2 {
+  font-size: 16px;
+  color: #ff6600;
+  margin-bottom: 16px;
+}
 
-    #sim-controls {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+#sim-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
 
-    #sim-controls input {
-      flex: 1;
-      min-width: 150px;
-    }
+#sim-controls input {
+  width: 200px;
+}
 
-    #sim-controls select {
-      flex: 1;
-      min-width: 150px;
-    }
+#sim-result {
+  font-size: 18px;
+  color: #fff;
+  min-height: 28px;
+}
 
-    #sim-result {
-      font-size: 18px;
-      color: #fff;
-      min-height: 28px;
-    }
-
-    #sim-result span {
-      color: #ff6600;
-      font-weight: bold;
-    }
+#sim-result span {
+  color: #ff6600;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -175,61 +148,48 @@
   </div>
 
   <div id="simulator">
-    <h2>Buy Simulator</h2>
-    <div id="sim-controls">
-      <input type="number" id="sim-amount" placeholder="Amount in EUR" oninput="simulate()">
-      <select id="sim-coin" onchange="simulate()">
-        <option value="bitcoin">Bitcoin (BTC)</option>
-        <option value="ethereum">Ethereum (ETH)</option>
-        <option value="solana">Solana (SOL)</option>
-      </select>
-    </div>
-    <div id="sim-result"></div>
+  <h2>Buy Simulator</h2>
+  <div id="sim-controls">
+<input type="number" id="sim-amount" placeholder="Amount in EUR" oninput="window.simulate()">
+<select id="sim-coin" onchange="window.simulate()">
+      <option value="bitcoin">Bitcoin (BTC)</option>
+      <option value="ethereum">Ethereum (ETH)</option>
+      <option value="solana">SOL</option>
+    </select>
   </div>
+  <div id="sim-result"></div>
+</div>
 
   <div id="grid">
     <div class="loading">Fetching DFX assets...</div>
   </div>
+<script>
+async function simulate() {
+  const amount = parseFloat(document.getElementById("sim-amount").value);
+  const coin = document.getElementById("sim-coin").value;
 
-  <script>
-    async function simulate() {
-      const amount = parseFloat(document.getElementById("sim-amount").value);
-      const coin = document.getElementById("sim-coin").value;
+  if (!amount || amount <= 0) {
+    document.getElementById("sim-result").innerHTML = "";
+    return;
+  }
 
-      if (!amount || amount <= 0) {
-        document.getElementById("sim-result").innerHTML = "";
-        return;
-      }
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`
+  );
+  const data = await response.json();
+  const price = data[coin].eur;
 
-const response = await fetch(
-  `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`)}`
-);
+  const dfxFee = 0.0149;
+  const amountAfterFee = amount * (1 - dfxFee);
+  const crypto = (amountAfterFee / price).toFixed(6);
+  const feeAmount = (amount * dfxFee).toFixed(2);
 
-      const data = await response.json();
-      const price = data[coin].eur;
-
-      const dfxFee = 0.0149;
-      const amountAfterFee = amount * (1 - dfxFee);
-      const crypto = (amountAfterFee / price).toFixed(6);
-      const feeAmount = (amount * dfxFee).toFixed(2);
-
-      document.getElementById("sim-result").innerHTML = `
-        Du bekommst: <span>${crypto} ${coin.toUpperCase()}</span><br>
-        <small style="color:#666">DFX Gebühr: €${feeAmount} (1.49%) · Preis: €${price.toLocaleString()} per ${coin.toUpperCase()}</small>
-      `;
-    }
-  </script>
+  document.getElementById("sim-result").innerHTML = `
+    Du bekommst: <span>${crypto} ${coin.toUpperCase()}</span><br>
+    <small style="color:#666">DFX Gebühr: €${feeAmount} (1.49%) · Preis: €${price.toLocaleString()} per ${coin.toUpperCase()}</small>
+  `;
+}
+</script>
   <script src="app.js"></script>
 </body>
 </html>
-```
-
-`Cmd + S` — dann die drei Git Befehle:
-```
-git add .
-```
-```
-git commit -m "Improve mobile responsive layout"
-```
-```
-git push
