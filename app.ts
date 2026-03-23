@@ -53,4 +53,35 @@ const render = () => {
   `).join("");
 };
 
+const simulate = async () => {
+  const amount = parseFloat(
+    (document.getElementById("sim-amount") as HTMLInputElement).value
+  );
+  const coin = (document.getElementById("sim-coin") as HTMLSelectElement).value;
+
+  if (!amount || amount <= 0) {
+    document.getElementById("sim-result")!.innerHTML = "";
+    return;
+  }
+
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`
+  );
+  const data = await response.json();
+  const price = data[coin].eur;
+
+  const dfxFee = 0.0149; // 1.49% DFX Standard-Gebühr
+  const amountAfterFee = amount * (1 - dfxFee);
+  const crypto = (amountAfterFee / price).toFixed(6);
+  const feeAmount = (amount * dfxFee).toFixed(2);
+
+  document.getElementById("sim-result")!.innerHTML = `
+    Du bekommst: <span>${crypto} ${coin.toUpperCase()}</span><br>
+    <small style="color:#666">DFX Gebühr: €${feeAmount} (1.49%) · Preis: €${price.toLocaleString()} per ${coin.toUpperCase()}</small>
+  `;
+};
+
+(window as any).simulate = simulate;
+npx tsc app.ts --target es6 --moduleResolution node --esModuleInterop true
+
 fetchAssets();

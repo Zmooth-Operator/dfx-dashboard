@@ -87,6 +87,40 @@
     }
 
     .loading { text-align: center; color: #666; padding: 60px; font-size: 18px; }
+    #simulator {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid #333;
+}
+
+#simulator h2 {
+  font-size: 16px;
+  color: #ff6600;
+  margin-bottom: 16px;
+}
+
+#sim-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#sim-controls input {
+  width: 200px;
+}
+
+#sim-result {
+  font-size: 18px;
+  color: #fff;
+  min-height: 28px;
+}
+
+#sim-result span {
+  color: #ff6600;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -113,10 +147,49 @@
     </select>
   </div>
 
+  <div id="simulator">
+  <h2>Buy Simulator</h2>
+  <div id="sim-controls">
+<input type="number" id="sim-amount" placeholder="Amount in EUR" oninput="window.simulate()">
+<select id="sim-coin" onchange="window.simulate()">
+      <option value="bitcoin">Bitcoin (BTC)</option>
+      <option value="ethereum">Ethereum (ETH)</option>
+      <option value="solana">SOL</option>
+    </select>
+  </div>
+  <div id="sim-result"></div>
+</div>
+
   <div id="grid">
     <div class="loading">Fetching DFX assets...</div>
   </div>
+<script>
+async function simulate() {
+  const amount = parseFloat(document.getElementById("sim-amount").value);
+  const coin = document.getElementById("sim-coin").value;
 
+  if (!amount || amount <= 0) {
+    document.getElementById("sim-result").innerHTML = "";
+    return;
+  }
+
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=eur`
+  );
+  const data = await response.json();
+  const price = data[coin].eur;
+
+  const dfxFee = 0.0149;
+  const amountAfterFee = amount * (1 - dfxFee);
+  const crypto = (amountAfterFee / price).toFixed(6);
+  const feeAmount = (amount * dfxFee).toFixed(2);
+
+  document.getElementById("sim-result").innerHTML = `
+    Du bekommst: <span>${crypto} ${coin.toUpperCase()}</span><br>
+    <small style="color:#666">DFX Gebühr: €${feeAmount} (1.49%) · Preis: €${price.toLocaleString()} per ${coin.toUpperCase()}</small>
+  `;
+}
+</script>
   <script src="app.js"></script>
 </body>
 </html>
